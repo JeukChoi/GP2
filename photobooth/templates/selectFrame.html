@@ -1,0 +1,171 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+<meta charset="UTF-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1, user-scalable=no" />
+<title>성신여자대학교 금공네컷</title>
+
+<link href="https://fonts.googleapis.com/css2?family=Jua&display=swap" rel="stylesheet" />
+
+<style>
+  html, body {
+    margin: 0; padding: 0; height: 100%;
+    background-color: #f9f9f9;
+    font-family: 'Jua', sans-serif;
+    text-align: center;
+    overflow: hidden;
+  }
+
+  body {
+    display: flex;
+    flex-direction: column;
+    height: 100vh;
+    box-sizing: border-box;
+  }
+
+  h2 {
+    color: #005BAB;
+    margin: 24px 0;
+    font-family: 'Jua', sans-serif;
+    font-size: 48px;
+    flex-shrink: 0;
+  }
+
+  /* 프레임 이미지들을 담는 컨테이너 */
+  .frames-container {
+    flex-grow: 1;
+    display: flex;
+    flex-direction: column;
+    max-width: 90vw;
+    margin: 0 auto;
+  }
+
+  /* 프레임 이미지들을 4열 그리드로 배치 */
+  .frames {
+    display: grid;
+    grid-template-columns: repeat(4, 1fr);
+    gap: 8px;
+    padding: 0 6px;
+    box-sizing: border-box;
+    overflow: hidden;
+  }
+
+  .frames img {
+    width: 90%;
+    height: auto;
+    cursor: pointer;
+    border: 2px solid transparent;
+    border-radius: 10px;
+    object-fit: cover;
+    transition: border-color 0.3s;
+    margin: 0 auto;
+    display: block;
+  }
+
+  .frames img.selected {
+    border-color: #005BAB;
+  }
+
+  #next-btn-container {
+    margin-top: 24px;
+    flex-shrink: 0;
+    text-align: center;
+  }
+
+  /* NEXT 버튼 기본 스타일(비활성화 상태)*/
+  button#next-btn {
+    padding: 14px 48px;
+    font-size: 22px;
+    border: none;
+    border-radius: 8px;
+    background-color: #ccc;
+    color: #666;
+    cursor: not-allowed;
+    transition: background-color 0.3s;
+    max-width: 280px;
+    width: 80%;
+    box-sizing: border-box;
+    font-family: 'Jua', sans-serif;
+  }
+
+  /* NEXT 버튼 활성화 상태 */
+  button#next-btn.enabled {
+    background-color: #005BAB;
+    color: white;
+    cursor: pointer;
+  }
+</style>
+</head>
+<body>
+
+<h2>프레임을 선택하세요</h2>
+
+<div class="frames-container">
+  <div class="frames">
+    <img src="{{ url_for('static', filename='images/frame1.png') }}" alt="프레임 1" />
+    <img src="{{ url_for('static', filename='images/frame2.png') }}" alt="프레임 2" />
+    <img src="{{ url_for('static', filename='images/frame3.png') }}" alt="프레임 3" />
+    <img src="{{ url_for('static', filename='images/frame4.png') }}" alt="프레임 4" />
+  </div>
+  <div id="next-btn-container">
+    <button id="next-btn" disabled>NEXT</button>
+  </div>
+</div>
+
+<script>
+  // 프레임 이미지 모두 선택(nodelist) 가져오기
+  const frames = document.querySelectorAll('.frames img');
+  const nextBtn = document.getElementById('next-btn');
+  let selectedFrame = null;
+
+  const session_id = "{{ session_id }}";
+
+  // 효과음 로드
+  const selectSound = new Audio('{{ url_for("static", filename="sfx/select.mp3") }}');
+  const cancelSound = new Audio('{{ url_for("static", filename="sfx/cancel.mp3") }}');
+  const buttonSound = new Audio('{{ url_for("static", filename="sfx/button.mp3") }}');
+
+  // 각 프레임 이미지 클릭 이벤트 등록
+  frames.forEach(frame => {
+    frame.addEventListener('click', () => {
+      if (frame.classList.contains('selected')) {
+        // 이미 선택된 프레임 클릭 시 선택 해제
+        frame.classList.remove('selected');
+        selectedFrame = null;
+        // NEXT 버튼 비활성화 및 스타일 변경
+        nextBtn.disabled = true;
+        nextBtn.classList.remove('enabled');
+        // 선택 취소 효과음 재생
+        cancelSound.play().catch(() => {});
+      } else {
+        // 다른 프레임이 선택된 상태면 이전 선택 해제
+        if (selectedFrame) {
+          selectedFrame.classList.remove('selected');
+        }
+        // 현재 프레임 선택 표시
+        frame.classList.add('selected');
+        selectedFrame = frame;
+        // NEXT 버튼 활성화 및 스타일 변경
+        nextBtn.disabled = false;
+        nextBtn.classList.add('enabled');
+        // 선택 효과음 재생
+        selectSound.play().catch(() => {});
+      }
+    });
+  });
+
+  nextBtn.addEventListener('click', () => {
+    if (!nextBtn.disabled && selectedFrame) {
+      // 효과음 재생 후 0.9초 지연 후 shoot으로 이동-> 효과음 나오기에 적절한 시간
+      buttonSound.play().catch(() => {});
+      setTimeout(() => {
+        const src = selectedFrame.getAttribute('src');
+        const frameFile = src.split('/').pop();
+        window.location.href = `{{ url_for('shoot') }}?frame=${encodeURIComponent(frameFile)}&session_id=${encodeURIComponent(session_id)}`;
+      }, 900);
+    }
+  });
+</script>
+
+</body>
+</html>
