@@ -1,0 +1,146 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+<meta charset="UTF-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1, user-scalable=no" />
+<title>성신여자대학교 금공네컷</title>
+
+<link href="https://fonts.googleapis.com/css2?family=Jua&display=swap" rel="stylesheet" />
+
+<style>
+  html, body {
+    height: 100%;
+    margin: 0; padding: 0;
+    font-family: 'Jua', Arial, sans-serif;
+    background-color: #f9f9f9;
+    overflow: hidden;
+    text-align: center;
+  }
+
+  body {
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    height: 100vh;
+    box-sizing: border-box;
+  }
+
+  .container {
+    display: flex;
+    max-width: 880px;
+    width: 100%;
+    gap: 30px;
+    align-items: center;
+    justify-content: center;
+    flex-wrap: nowrap;
+  }
+
+  .image-section, .qr-section {
+    flex: 1;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    flex-direction: column;
+  }
+
+  .image-section img {
+    max-width: 70%; 
+    height: auto;
+    border: 3px solid #005BAB;
+    border-radius: 8px;
+    box-shadow: 0 4px 8px rgba(0,91,171,0.3);
+  }
+
+  .qr-section h2 {
+    margin-bottom: 20px;
+    font-size: 30px;
+    color: #003366;
+    font-family: 'Jua', Arial, sans-serif;
+  }
+
+  .qr-section img {
+    width: 240px;
+    height: 240px;
+    margin-bottom: 30px;
+    border-radius: 8px;
+    box-shadow: 0 4px 6px rgba(0,91,171,0.25);
+  }
+
+  button {
+    background-color: #005BAB;
+    border: none;
+    color: white;
+    padding: 18px 48px;
+    font-size: 24px;
+    border-radius: 6px;
+    cursor: pointer;
+    box-shadow: 0 3px 6px rgba(0,91,171,0.4);
+    transition: background-color 0.3s;
+    max-width: 280px;
+    width: 80%;
+    font-family: 'Jua', Arial, sans-serif;
+  }
+
+  button:hover {
+    background-color: #004080;
+  }
+
+  /* 반응형 */
+  @media (max-width: 900px) {
+    body {
+      overflow-y: auto;
+    }
+    .container {
+      flex-direction: column;
+      max-width: 100%;
+      gap: 20px;
+      height: auto;
+    }
+    .image-section, .qr-section {
+      width: 90vw;
+      max-width: 350px;
+    }
+    .qr-section h2 {
+      font-size: 24px;
+      margin-bottom: 16px;
+    }
+    .qr-section img {
+      width: 180px;
+      height: 180px;
+      margin-bottom: 20px;
+    }
+    button {
+      max-width: none;
+      width: 90vw;
+      padding: 14px 32px;
+      font-size: 20px;
+    }
+  }
+</style>
+</head>
+<body>
+  <div class="container">
+    <div class="image-section">
+      <img id="compositeImage" src="" alt="결과물" />
+    </div>
+    <div class="qr-section">
+      <h2>QR 코드 촬영하여 사진 다운로드</h2>
+      <img id="qrCode" src="" alt="QR 코드" />
+      <button onclick="location.href='/'">처음으로</button>
+    </div>
+  </div>
+
+<script>
+  const params = new URLSearchParams(window.location.search);
+  const imageUrl = params.get('img_url');
+
+  // 결과 이미지와 QR코드 생성
+  if(imageUrl) {
+    document.getElementById('compositeImage').src = imageUrl;
+    document.getElementById('qrCode').src = '/generate_qr?url=' + encodeURIComponent(imageUrl);
+  } else {
+    alert('이미지 정보가 없습니다.');
+  }
+</script>
+</body>
+</html>
