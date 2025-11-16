@@ -1,0 +1,192 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+<meta charset="UTF-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1, user-scalable=no" />
+<title>성신여자대학교 금공네컷</title>
+
+<link href="https://fonts.googleapis.com/css2?family=Jua&display=swap" rel="stylesheet" />
+
+<style>
+  body {
+    display: flex;
+    flex-direction: column;
+    min-height: 100vh;
+    margin: 0;
+    font-family: 'Jua', sans-serif;
+    background-color: #f5f7fa;
+    color: #003F62;
+  }
+
+  header {
+    padding: 20px;
+    background-color: #003766;
+    color: white;
+    font-size: 20px;
+    font-weight: bold;
+    box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+    flex-shrink: 0;
+  }
+
+  main {
+    flex-grow: 1;
+    display: flex;
+    flex-direction: row;
+    justify-content: center;
+    align-items: center;
+    gap: 50px;
+    padding: 20px;
+    box-sizing: border-box;
+  }
+
+  main img {
+    max-width: 320px;
+    height: auto;
+    border-radius: 10px;
+    box-shadow: 0 4px 8px rgba(53, 122, 189, 0.3);
+  }
+
+  .event-container {
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+    align-items: center;
+    max-width: 400px;
+  }
+
+  .event-title {
+    font-size: 48px;
+    color: #003F62;
+    margin-bottom: 20px;
+    font-weight: bold;
+    text-align: center;
+    white-space: pre-line;
+    line-height: 1.2;
+  }
+
+  .event-subtitle {
+    font-size: 20px;
+    color: #003F62;
+    margin-bottom: 40px;
+    text-align: center;
+    font-weight: 500;
+  }
+
+  button {
+    padding: 45px 160px;
+    font-size: 48px;
+    cursor: pointer;
+    border: none;
+    background-color: #357ABD;
+    color: white;
+    border-radius: 8px;
+    box-shadow: 0 4px 6px rgba(53, 122, 189, 0.4);
+    transition: background-color 0.3s ease;
+    white-space: nowrap;
+    text-align: center;
+    font-family: 'Jua', sans-serif;
+  }
+  /* 버튼 호버 상태 스타일 변경 */
+  button:hover {
+    background-color: #2A5D9E;
+  }
+
+  /* 반응형 스타일- 태블릿 세로 모드*/
+  @media only screen and (max-width: 834px) and (orientation: portrait) {
+    main {
+      gap: 30px;
+      padding: 15px;
+    }
+    main img {
+      max-width: 260px;
+    }
+    .event-container {
+      max-width: 300px;
+    }
+    .event-title {
+      font-size: 36px;
+      margin-bottom: 15px;
+      line-height: 1.2;
+    }
+    .event-subtitle {
+      font-size: 16px;
+      margin-bottom: 30px;
+    }
+    button {
+      padding: 36px 130px;
+      font-size: 28px;
+    }
+  }
+
+  /* 반응형 스타일- 모바일 모드*/
+  @media screen and (max-width: 480px) {
+    main {
+      flex-direction: column;
+      gap: 25px;
+    }
+    main img {
+      max-width: 80%;
+    }
+    .event-container {
+      max-width: 100%;
+      align-items: center;
+    }
+    .event-title {
+      font-size: 32px;
+      margin-bottom: 10px;
+      line-height: 1.2;
+    }
+    .event-subtitle {
+      font-size: 14px;
+      margin-bottom: 20px;
+    }
+    button {
+      padding: 28px 100px;
+      font-size: 24px;
+    }
+  }
+</style>
+</head>
+
+<body>
+
+<header>
+  성신여자대학교 금공네컷
+</header>
+
+<main>
+  <img src="{{ url_for('static', filename='images/poster.jpg') }}" alt="예시 사진" />
+
+  <div class="event-container">
+    <div class="event-title">성신여자대학교<br>금공네컷</div>
+    <div class="event-subtitle">소중한 순간, 추억으로 간직하세요</div>
+
+    <!-- Flask 템플릿 내 URL 생성 변수 -->
+    {% set select_frame_url = url_for('select_frame') %}
+
+    <button id="start-btn">시작</button>
+  </div>
+</main>
+
+<footer>
+</footer>
+
+<!-- 시작 버튼 클릭 시 효과음 재생 및 페이지 이동 -->
+<script>
+  // 버튼 클릭 시 재생할 효과음 오디오 객체 생성
+  const audio = new Audio('{{ url_for("static", filename="sfx/button.mp3") }}');
+  const startBtn = document.getElementById('start-btn');
+
+  // 버튼 클릭 이벤트 핸들러 등록
+  startBtn.addEventListener('click', () => {
+    audio.play().catch(() => {});
+
+    // 효과음 재생 후 0.9초 지연 후 selectFrame으로 이동-> 효과음 나오기에 적절한 시간
+    setTimeout(() => {
+      window.location.href = '{{ select_frame_url }}';
+    }, 900);
+  });
+</script>
+
+</body>
+</html>
