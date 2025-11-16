@@ -1,0 +1,369 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+<meta charset="UTF-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1, user-scalable=no" />
+<title>성신여자대학교 금공네컷</title>
+
+<link href="https://fonts.googleapis.com/css2?family=Jua&display=swap" rel="stylesheet" />
+
+<style>
+  html, body {
+    height: 100%;
+    margin: 0;
+    font-family: 'Jua', Arial, sans-serif;
+    background-color: #f9f9f9;
+    text-align: center;
+    overflow: hidden;
+  }
+
+  h2 {
+    color: #005BAB;
+    margin: 20px 0 10px 0;
+    font-size: 28px;
+    font-weight: bold;
+  }
+
+  .main-layout {
+    display: flex;
+    gap: 24px;
+    justify-content: center;
+    align-items: flex-start;
+    max-width: 90vw;
+    height: 100vh;
+    padding: 15px 15px 30px 15px;
+    box-sizing: border-box;
+    overflow: hidden;
+  }
+
+  /* 프레임 미리보기 */
+  .frame-preview {
+    position: relative;
+    width: 420px;
+    height: 590px;
+    background: #eee;
+    flex-shrink: 0;
+  }
+
+  /* 미리보기 이미지 위치 조정 및 겹침 순서 */
+  .frame-preview img.frame-base {
+    width: 100%;
+    height: 100%;
+    position: absolute;
+    left: 0; top: 0;
+    z-index: 2;
+    pointer-events: none;
+  }
+
+  /* 선택된 사진 표시 영역 */
+  .selected-photo-area {
+    position: absolute;
+    width: 44.27%;
+    height: 38.89%;
+    background: transparent;
+    overflow: hidden;
+    z-index: 1;
+  }
+
+  /* 4개의 영역 각각 위치 설정 */
+  #area0 { left: 3.52%; top: 2.61%; }
+  #area1 { left: 52.17%; top: 2.61%; }
+  #area2 { left: 3.52%; top: 43.73%; }
+  #area3 { left: 52.17%; top: 43.73%; }
+  .selected-photo-area img {
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+    border: none;
+    pointer-events: none;
+  }
+
+  .divider {
+    width: 3px;
+    background: #ccc;
+    height: 590px;
+    flex-shrink: 0;
+  }
+
+  .right-section {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    min-width: 480px;
+    max-width: 480px;
+    height: 590px;
+    box-sizing: border-box;
+  }
+
+  /* 불러온 사진 오른쪽 영역 그리드 */
+  .photo-grid {
+    display: grid;
+    grid-template-columns: repeat(3, 1fr);
+    grid-template-rows: repeat(2, 190px);
+    gap: 12px;
+    width: 100%;
+    max-width: 480px;
+  }
+
+  .photo-item {
+    position: relative;
+    cursor: pointer;
+    border: 2.5px solid transparent;
+    aspect-ratio: 3 / 4;
+  }
+
+  .photo-item.selected {
+    border-color: #005BAB;
+  }
+
+  .photo-item img {
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+  }
+
+  /* 선택된 순서 뱃지 */
+  .order-badge {
+    position: absolute;
+    top: 6px;
+    right: 6px;
+    width: 28px;
+    height: 28px;
+    background: #005BAB;
+    color: white;
+    font-weight: bold;
+    font-size: 16px;
+    border-radius: 50%;
+    line-height: 28px;
+    text-align: center;
+    user-select: none;
+    pointer-events: none;
+    box-shadow: 0 2px 6px rgba(0,91,171,0.4);
+    z-index: 10;
+  }
+
+  /* 결정 버튼 스타일(비활성화) */
+  button#decide-btn {
+    margin-top: 75px; 
+    padding: 12px 90px;
+    font-size: 20px;
+    border-radius: 8px;
+    border: none;
+    background-color: #ccc;
+    color: #666;
+    cursor: not-allowed;
+    box-shadow: 0 4px 8px rgba(0,0,0,0.1);
+    transition: background-color 0.3s ease;
+    font-family: 'Jua', Arial, sans-serif;
+  }
+
+  /* 결정 버튼 스타일(활성) */
+  button#decide-btn.enabled {
+    background-color: #005BAB;
+    color: white;
+    cursor: pointer;
+    box-shadow: 0 4px 8px rgba(0, 91, 171, 0.4);
+  }
+
+  /* 반응형 */
+  @media (max-width: 1200px) {
+    .main-layout {
+      max-width: 100vw;
+      padding: 10px 12px 20px 12px;
+      gap: 18px;
+    }
+    .frame-preview {
+      width: 350px;
+      height: 495px;
+    }
+    .divider {
+      height: 495px;
+    }
+    .right-section {
+      min-width: 400px;
+      max-width: 400px;
+      height: 495px;
+    }
+    .photo-grid {
+      grid-template-rows: repeat(2, 160px);
+      gap: 10px;
+      max-width: 400px;
+    }
+    button#decide-btn {
+      margin-top: 80px;
+      padding: 10px 70px;
+      font-size: 18px;
+    }
+  }
+</style>
+</head>
+<body>
+<h2>사진을 선택하세요 (4장)</h2>
+<div class="main-layout">
+  <div class="frame-preview">
+    <img id="frameBase" class="frame-base" src="" alt="선택된 프레임" />
+    <div id="area0" class="selected-photo-area"></div>
+    <div id="area1" class="selected-photo-area"></div>
+    <div id="area2" class="selected-photo-area"></div>
+    <div id="area3" class="selected-photo-area"></div>
+  </div>
+  <div class="divider"></div>
+  <div class="right-section">
+    <div class="photo-grid" id="photoGrid"></div>
+    <!-- 결정 버튼 (초기 상태는 비활성화) -->
+    <button id="decide-btn" disabled>결정</button>
+  </div>
+</div>
+
+<script>
+  const photoGrid = document.getElementById('photoGrid');
+  const decideBtn = document.getElementById('decide-btn');
+  const previewAreas = [0,1,2,3].map(i => document.getElementById('area'+i));
+  const urlParams = new URLSearchParams(window.location.search);
+  const sessionId = urlParams.get('session_id');
+  const frameFile = urlParams.get('frame');
+  const frameBase = document.getElementById('frameBase');
+
+  // 효과음 객체 생성
+  const selectSound = new Audio('{{ url_for("static", filename="sfx/select.mp3") }}');
+  const cancelSound = new Audio('{{ url_for("static", filename="sfx/cancel.mp3") }}');
+  const buttonSound = new Audio('{{ url_for("static", filename="sfx/button.mp3") }}');
+
+  if(frameFile) {
+    frameBase.src = `/static/images/${frameFile}`;
+    frameBase.onerror = () => alert('선택된 프레임 이미지를 불러올 수 없습니다.');
+  } else {
+    alert('프레임 정보가 전달되지 않았습니다.');
+  }
+
+  // 사진 URL 배열과 선택된 사진 정보 배열
+  let photos = [];
+  let selectedPhotos = [];
+
+  // 서버에서 세션 ID 기반으로 사진 리스트 비동기 불러오기
+  async function loadPhotos() {
+    if (!sessionId) {
+      alert('세션 정보가 없습니다.');
+      return;
+    }
+    try {
+      const res = await fetch(`/list_photos/${sessionId}`);
+      const data = await res.json();
+      if(data.success) {
+        photos = data.photos;
+        renderPhotos();
+        renderPreview();
+      } else {
+        alert('사진을 불러올 수 없습니다.');
+      }
+    } catch(e) {
+      alert('서버 통신 오류: ' + e.message);
+    }
+  }
+
+  // 사진 썸네일 그리드 렌더링 함수
+  function renderPhotos() {
+    photoGrid.innerHTML = '';
+    photos.forEach((url, i) => {
+      const div = document.createElement('div');
+      div.classList.add('photo-item');
+      const img = document.createElement('img');
+      img.src = url;
+      img.alt = '촬영한 사진';
+      img.addEventListener('click', () => toggleSelect(i)); // 클릭 시 선택 토글
+      div.appendChild(img);
+
+      // 선택된 사진이면 선택 표시 및 순서 뱃지 추가
+      const chosen = selectedPhotos.find(p => p.index === i);
+      if(chosen) {
+        div.classList.add('selected');
+        const badge = document.createElement('span');
+        badge.className = 'order-badge';
+        badge.textContent = chosen.order; // 선택 순서 표시
+        div.appendChild(badge);
+      } else {
+        div.classList.remove('selected');
+      }
+      photoGrid.appendChild(div);
+    });
+    updateDecideButtonState();
+  }
+
+  // 사진 선택 토글 함수
+  function toggleSelect(index) {
+    const existingIndex = selectedPhotos.findIndex(p => p.index === index);
+    if(existingIndex === -1) {  // 선택 안된 사진일시
+      if(selectedPhotos.length < 4) {
+        selectedPhotos.push({index: index, order: selectedPhotos.length + 1});
+        selectSound.play().catch(() => {}); // 선택 효과음 재생
+      } else {
+        alert('4장까지 선택 가능합니다.');
+        return;
+      }
+    } else {  // 이미 선택된 사진은 선택 해제
+      selectedPhotos.splice(existingIndex, 1);
+      // 선택 순서 재조정
+      selectedPhotos.forEach((p, i) => p.order = i + 1);
+      cancelSound.play().catch(() => {}); // 선택 해제 효과음 재생
+    }
+    renderPhotos(); // UI 업데이트
+    renderPreview();
+  }
+
+  // 선택된 사진 미리보기 영역에 표시
+  function renderPreview() {
+    for(let i=0; i<4; i++) {
+      previewAreas[i].innerHTML = '';
+      if(selectedPhotos[i]) {
+        const img = document.createElement('img');
+        img.src = photos[selectedPhotos[i].index];
+        img.alt = `선택사진${i+1}`;
+        previewAreas[i].appendChild(img);
+      }
+    }
+  }
+
+  // 결정 버튼 활성화 & 비활성화
+  function updateDecideButtonState() {
+    if(selectedPhotos.length === 4) {
+      decideBtn.disabled = false;
+      decideBtn.classList.add('enabled');
+    } else {
+      decideBtn.disabled = true;
+      decideBtn.classList.remove('enabled');
+    }
+  }
+
+  // 선택한 사진과 프레임 정보를 서버에 저장 요청
+  decideBtn.addEventListener('click', async () => {
+    buttonSound.play().catch(() => {}); // 클릭 효과음 재생
+    try {
+      const res = await fetch('/save_selection', {
+        method: 'POST',
+        headers: {'Content-Type': 'application/json'},
+        body: JSON.stringify({
+          session_id: sessionId,
+          selected_photos: selectedPhotos.map(p => p.index + 1),
+          frame_file: frameFile
+        })
+      });
+      const data = await res.json();
+      // 효과음 재생 후 0.9초 지연 후 shoot으로 이동-> 효과음 나오기에 적절한 시간
+      if(data.success) {
+        setTimeout(() => {
+          window.location.href = data.redirect_url;
+        }, 900);
+      } else {
+        alert('선택 저장 실패: ' + data.message);
+      }
+    } catch(e) {
+      alert('서버 오류: ' + e.message);
+    }
+  });
+
+  loadPhotos();
+
+</script>
+
+</body>
+</html>
